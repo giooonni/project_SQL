@@ -160,6 +160,9 @@ SELECT
     DataNascita 
 FROM Studenti
 where DataNascita is null;
+
+-----------------------------------------------------
+
 SELECT 
     Titolo + ' ' + Descrizione AS [Materia],
     --ISNULL(LEFT(CONVERT(VARCHAR, OraInizio, 108), 2), 'N/D') as Ora,
@@ -179,3 +182,15 @@ SELECT
     'la lezione inizia alle ' +
     ISNULL(CONVERT(VARCHAR(5), OraInizio, 108), 'N/D') AS Ora
 FROM Lezioni;
+
+--------------------------------------------
+
+SELECT  s.Nome + ' ' + s.Cognome as [Studente],
+        s.CodiceFiscale as [CF],
+        ISNULL(CONVERT(VARCHAR, i.DataIscrizione, 105), 'Data non definita') AS [Data Iscrizione]
+FROM Studenti s
+RIGHT JOIN Iscrizioni i
+    ON i.StudenteID = s.StudenteID;
+
+-----------------------------------------------------
+
