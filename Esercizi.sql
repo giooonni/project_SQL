@@ -11,8 +11,17 @@ SELECT	s.Nome + ' ' + s.cognome as [nome completo],
 		avg(v.Voto) as [media voto]
 FROM Studenti s
 INNER JOIN Voti v
-	ON s.StudenteID = v.StudenteID
+	ON v.StudenteID = s.StudenteID
 GROUP BY s.Nome, s.Cognome, s.CodiceFiscale;
+
+SELECT	s.Nome + ' ' + s.cognome as [nome completo],
+		s.codicefiscale as [cf],
+		avg(v.Voto) as [media voto]
+FROM Studenti s
+INNER JOIN Voti v
+	ON v.StudenteID = s.StudenteID
+GROUP BY s.Nome, s.Cognome, s.CodiceFiscale;
+
 
 ----------------------------------------
 
@@ -94,14 +103,24 @@ WHERE v.Voto >= 28
 
 -- 2. Studenti senza corsi
 
-SELECT	'Studente senza corso' AS Tipo,
+SELECT	-- 'Studente senza corso' AS Tipo,
 		CONCAT(s.Nome, ' ', s.Cognome) AS Nome,
-		NULL AS Corso,
-		NULL AS Voto
+		'CORSO ' + ISNULL(c.NomeCorso, 'N/D') AS Corso		
 FROM Studenti AS s
 LEFT JOIN Iscrizioni AS i
 	ON s.StudenteID = i.StudenteID
+LEFT JOIN Corso AS c
+	ON c.CorsoID = i.CorsoID
 WHERE i.IscrizioneID IS NULL
+
+--------------------------------------
+
+SELECT 
+    Titolo + ' ' + Descrizione AS [Materia],
+    'la lezione inizia alle ' +
+    CAST(DATEPART(HOUR, OraInizio) AS nvarchar(2)) + ':' + 
+    RIGHT('0' + CAST(DATEPART(MINUTE, OraInizio) as nvarchar(2)), 2 ) as Orario
+FROM Lezioni;
 
 
 -- 3. Corsi senza studenti
@@ -118,7 +137,36 @@ WHERE i.IscrizioneID IS NULL;
 -- FULL JOIN
 
 SELECT CONCAT(s.Nome, ' ', s.Cognome) AS NomeStudente,
-		v.Voto
+		ISNULL(v.Voto, 0) AS Voto
 FROM Studenti AS s
-FULL JOIN Voti AS v
+FULL OUTER JOIN Voti AS v
     ON s.StudenteID = v.StudenteID;
+
+--------------------------
+
+
+SELECT 
+    ISNULL(c.NomeCorso, 'Non defuinito') AS Corso,
+    CAST(ISNULL(c.Crediti, 0) as INT) as Crediti,
+    CAST(ISNULL(c.Durata,  0) as INT) as Durata
+FROM Studenti s 
+LEFT JOIN Iscrizioni i
+    ON i.StudenteId = s.StudenteId
+LEFT JOIN Corso c
+    ON c.CorsoId = i.CorsoId
+WHERE c.CorsoId IS NOT NULL
+ORDER by s.Nome ASC;
+
+--------------------------------
+
+SELECT 
+    ISNULL(c.NomeCorso, 'Non defuinito') AS Corso,
+    CAST(ISNULL(c.Crediti, 0) as INT) as Crediti,
+    CAST(ISNULL(c.Durata,  0) as INT) as Durata
+FROM Studenti s 
+LEFT JOIN Iscrizioni i
+    ON i.StudenteId = s.StudenteId
+LEFT JOIN Corso c
+    ON c.CorsoId = i.CorsoId
+WHERE c.CorsoId IS NOT NULL
+ORDER by s.Nome ASC;
